@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Class Study Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Safe Study" />
+  <title>Safe Study · Class Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📚%3C/text%3E%3C/svg%3E" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #0f172a;
       --card: #1e293b;
+      --card-alt: #162032;
       --border: #334155;
       --text: #f8fafc;
       --muted: #94a3b8;
@@ -16,70 +23,184 @@
       --accent-dark: #0284c7;
       --success: #22c55e;
       --warn: #f59e0b;
+      --danger: #ef4444;
     }
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0; background: var(--bg); color: var(--text);
-      padding: 16px; max-width: 600px; margin-inline: auto;
+      padding: 16px 16px 88px; max-width: 600px; margin-inline: auto;
     }
-    h1 { font-size: 1.4rem; margin: 0 0 4px; }
-    p.sub { color: var(--muted); font-size: 0.9rem; margin: 0 0 16px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tab {
-      flex: 1; padding: 10px; border: 1px solid var(--border);
-      background: var(--card); color: var(--text); border-radius: 10px;
-      font-weight: 600; cursor: pointer;
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    h1 { font-size: 1.35rem; margin: 0 0 2px; }
+    p.sub { color: var(--muted); font-size: 0.85rem; margin: 0; }
+    #installBtn {
+      display: none; background: rgba(56, 189, 248, 0.15); color: var(--accent);
+      border: 1px solid var(--accent); border-radius: 999px; padding: 6px 12px;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
     }
-    .tab.active { background: var(--accent-dark); border-color: var(--accent); }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px;
+    }
+    .stat-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 8px; text-align: center;
+    }
+    .stat-val { font-size: 1.15rem; font-weight: 800; color: var(--accent); }
+    .stat-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* Bottom App Nav */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; padding: 8px 12px;
+      max-width: 600px; margin: 0 auto; z-index: 50;
+    }
+    .nav-btn {
+      flex: 1; background: none; border: none; color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer; padding: 4px;
+    }
+    .nav-btn span.ico { font-size: 1.2rem; }
+    .nav-btn.active { color: var(--accent); }
+
     .card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 16px; margin-bottom: 16px;
+      border-radius: 14px; padding: 16px; margin-bottom: 14px;
     }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
-    input, select {
+    .card-title { font-weight: 700; font-size: 0.98rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Focus Timer */
+    .timer-presets { display: flex; gap: 6px; margin-bottom: 10px; }
+    .preset-btn {
+      flex: 1; padding: 6px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--muted); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    }
+    .preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(56, 189, 248, 0.1); }
+    .timer-display {
+      font-size: 2.3rem; font-weight: 800; text-align: center;
+      font-variant-numeric: tabular-nums; letter-spacing: 1px; margin: 8px 0 12px;
+    }
+    .timer-controls { display: flex; gap: 8px; }
+    .timer-controls button {
+      flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border);
+      font-weight: 700; cursor: pointer; font-size: 0.9rem;
+    }
+    .btn-start { background: var(--success); color: #052e16; border: none !important; }
+    .btn-pause { background: var(--warn); color: #451a03; border: none !important; }
+    .btn-reset { background: var(--bg); color: var(--text); }
+
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea {
       width: 100%; padding: 10px 12px; margin-bottom: 12px;
       border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 1rem;
+      background: var(--bg); color: var(--text); font-size: 0.95rem;
     }
+    textarea { resize: vertical; min-height: 76px; font-size: 0.85rem; }
     button.primary {
       width: 100%; padding: 12px; border: none; border-radius: 10px;
       background: var(--accent); color: #0f172a; font-weight: 700;
-      font-size: 1rem; cursor: pointer;
+      font-size: 0.98rem; cursor: pointer;
     }
-    button.primary:disabled { opacity: 0.6; }
+    button.secondary {
+      width: 100%; padding: 10px; border: 1px solid var(--accent); border-radius: 10px;
+      background: rgba(56, 189, 248, 0.12); color: var(--accent); font-weight: 700;
+      font-size: 0.9rem; cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; }
+
+    /* Filter Pills */
+    .pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 6px; scrollbar-width: none; }
+    .pills::-webkit-scrollbar { display: none; }
+    .pill {
+      padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--muted); font-size: 0.78rem; font-weight: 600;
+      white-space: nowrap; cursor: pointer;
+    }
+    .pill.active { background: var(--accent-dark); border-color: var(--accent); color: #fff; }
+
     .item {
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
     .item:last-child { border-bottom: none; }
+    .item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .badge {
-      font-size: 0.75rem; padding: 3px 8px; border-radius: 999px;
-      background: rgba(56, 189, 248, 0.15); color: var(--accent); font-weight: 600;
+      font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15); color: var(--accent); font-weight: 700;
     }
     .badge.rev { background: rgba(245, 158, 11, 0.15); color: var(--warn); }
+    .badge.ok { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .badge.due-soon { background: rgba(245, 158, 11, 0.18); color: var(--warn); }
+    .badge.overdue { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+
+    .del-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: 4px 7px; font-size: 0.78rem; cursor: pointer;
+    }
+    .del-btn:hover { border-color: var(--danger); color: #f87171; }
+
     .hidden { display: none; }
-    .stat-row { display: flex; justify-content: space-between; padding: 8px 0; }
+    .stat-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .stat-row:last-child { border-bottom: none; }
   </style>
 </head>
 <body>
 
-  <h1>📚 Class Study Tracker</h1>
-  <p class="sub">Log daily study sessions & track class deadlines</p>
+  <header>
+    <div>
+      <h1>📚 Safe Study</h1>
+      <p class="sub">Study tracker, focus timer & LMS deadlines</p>
+    </div>
+    <button id="installBtn">📲 Install App</button>
+  </header>
 
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('logs', this)">Study Logs</button>
-    <button class="tab" onclick="showTab('deadlines', this)">Deadlines</button>
-    <button class="tab" onclick="showTab('board', this)">Leaderboard</button>
+  <!-- PERSONAL STATS BAR -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-val" id="statHours">0.0h</div>
+      <div class="stat-lbl">Your Study Time</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="statSessions">0</div>
+      <div class="stat-lbl">Sessions</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="statDue">0</div>
+      <div class="stat-lbl">Upcoming Due</div>
+    </div>
   </div>
 
-  <!-- TAB 1: STUDY LOGS -->
+  <!-- TAB 1: STUDY LOGS & FOCUS TIMER -->
   <div id="tab-logs">
     <div class="card">
+      <div class="card-title">
+        <span>⏱️ Focus Timer</span>
+        <span id="timerStatus" style="font-size:0.78rem; color:var(--muted);">Ready</span>
+      </div>
+      <div class="timer-presets">
+        <button class="preset-btn active" onclick="setPreset(25, this)">25m Focus</button>
+        <button class="preset-btn" onclick="setPreset(45, this)">45m Deep</button>
+        <button class="preset-btn" onclick="setPreset(60, this)">60m Block</button>
+        <button class="preset-btn" onclick="setPreset(0, this)">Stopwatch</button>
+      </div>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <button class="btn-start" id="startStopBtn" onclick="toggleTimer()">▶ Start</button>
+        <button class="btn-reset" onclick="applyTimerMinutes()">✓ Use Mins</button>
+        <button class="btn-reset" onclick="resetTimer()">↺ Reset</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📝 Log Study Session</span></div>
       <label>Your Name</label>
-      <input id="studentName" placeholder="e.g., Hannan" />
+      <input id="studentName" placeholder="e.g., Hannan" oninput="renderStatsAndLogs()" />
 
       <label>Subject / Course</label>
-      <input id="subject" placeholder="e.g., CS101 / Calculus" />
+      <input id="subject" placeholder="e.g., CS201 / MTH101" />
 
       <label>Topic Covered</label>
       <input id="topic" placeholder="e.g., Loops & Arrays" />
@@ -97,14 +218,23 @@
     </div>
 
     <div class="card">
-      <strong>Recent Class Activity</strong>
-      <div id="logsList" style="margin-top: 8px; color: var(--muted);">Loading...</div>
+      <div class="card-title"><span>Recent Class Activity</span></div>
+      <div class="pills" id="subjectPills"></div>
+      <div id="logsList" style="color: var(--muted);">Loading...</div>
     </div>
   </div>
 
-  <!-- TAB 2: DEADLINES -->
+  <!-- TAB 2: DEADLINES + VULMS PASTE IMPORT -->
   <div id="tab-deadlines" class="hidden">
     <div class="card">
+      <div class="card-title"><span>⚡ Quick Import from VULMS</span></div>
+      <label>Paste copied text from VULMS Assignments / Quizzes / GDBs</label>
+      <textarea id="lmsPaste" placeholder="Example:&#10;CS201 - Assignment No. 1 Due Date: Nov 28, 2026&#10;MTH101 - Quiz 2 Due: 2026-12-02"></textarea>
+      <button class="secondary" id="importLmsBtn" onclick="importFromLms()">✨ Extract & Save Deadlines</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>➕ Add Single Deadline</span></div>
       <label>Subject</label>
       <input id="dlSubject" placeholder="e.g., MTH101" />
 
@@ -118,101 +248,282 @@
     </div>
 
     <div class="card">
-      <strong>Upcoming Deadlines</strong>
-      <div id="deadlinesList" style="margin-top: 8px; color: var(--muted);">Loading...</div>
+      <div class="card-title"><span>📅 Upcoming Deadlines</span></div>
+      <div id="deadlinesList" style="color: var(--muted);">Loading...</div>
     </div>
   </div>
 
   <!-- TAB 3: LEADERBOARD -->
   <div id="tab-board" class="hidden">
     <div class="card">
-      <strong>🏆 Total Study Time by Student</strong>
-      <div id="boardList" style="margin-top: 10px; color: var(--muted);">Loading...</div>
+      <div class="card-title"><span>🏆 Total Study Time by Student</span></div>
+      <div id="boardList" style="color: var(--muted);">Loading...</div>
     </div>
   </div>
 
+  <!-- BOTTOM APP NAVIGATION -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showTab('logs', this)">
+      <span class="ico">📖</span><span>Study</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('deadlines', this)">
+      <span class="ico">⏰</span><span>Deadlines</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('board', this)">
+      <span class="ico">🏆</span><span>Leaderboard</span>
+    </button>
+  </nav>
+
   <script>
+    // 1. PWA Service Worker & Install Prompt
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+    let deferredPrompt;
+    const installBtn = document.getElementById("installBtn");
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = "inline-block";
+    });
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    });
+
+    // 2. Supabase Setup
     const SUPABASE_URL = "https://difzwjrijpwxujevfxvv.supabase.co";
     const SUPABASE_KEY = "sb_publishable_wNeXtuZT66eNdobvyRjTOw_W5oznjv3";
-
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allLogs = [];
+    let allDeadlines = [];
+    let selectedSubject = "ALL";
 
     const savedName = localStorage.getItem("studentName");
     if (savedName) document.getElementById("studentName").value = savedName;
 
     function showTab(name, btn) {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(t => t.classList.remove("active"));
       btn.classList.add("active");
       ["logs", "deadlines", "board"].forEach(id => {
         document.getElementById("tab-" + id).classList.toggle("hidden", id !== name);
       });
     }
 
+    // 3. Focus / Pomodoro Timer
+    let presetMinutes = 25;
+    let remainingSeconds = 25 * 60;
+    let elapsedSeconds = 0;
+    let timerInterval = null;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, "0");
+      const s = (sec % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function setPreset(mins, btn) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById("startStopBtn").textContent = "▶ Start";
+      document.getElementById("startStopBtn").className = "btn-start";
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      presetMinutes = mins;
+      elapsedSeconds = 0;
+      remainingSeconds = mins * 60;
+      document.getElementById("timerDisplay").textContent = formatTime(remainingSeconds);
+      document.getElementById("timerStatus").textContent = mins === 0 ? "Stopwatch" : `${mins}m Timer`;
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById("startStopBtn");
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.textContent = "▶ Resume";
+        btn.className = "btn-start";
+        document.getElementById("timerStatus").textContent = "Paused";
+        return;
+      }
+      btn.textContent = "⏸ Pause";
+      btn.className = "btn-pause";
+      document.getElementById("timerStatus").textContent = "Focusing...";
+      timerInterval = setInterval(() => {
+        elapsedSeconds++;
+        if (presetMinutes === 0) {
+          document.getElementById("timerDisplay").textContent = formatTime(elapsedSeconds);
+        } else {
+          remainingSeconds--;
+          document.getElementById("timerDisplay").textContent = formatTime(Math.max(0, remainingSeconds));
+          if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            btn.textContent = "▶ Start";
+            btn.className = "btn-start";
+            document.getElementById("timerStatus").textContent = "Session Complete!";
+            document.getElementById("minutes").value = presetMinutes;
+            alert(`Focus session complete! ${presetMinutes} minutes filled into your log.`);
+          }
+        }
+      }, 1000);
+    }
+
+    function applyTimerMinutes() {
+      const mins = Math.max(1, Math.round(elapsedSeconds / 60));
+      document.getElementById("minutes").value = mins;
+      document.getElementById("timerStatus").textContent = `Applied ${mins}m`;
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      elapsedSeconds = 0;
+      remainingSeconds = presetMinutes * 60;
+      document.getElementById("timerDisplay").textContent = formatTime(remainingSeconds);
+      document.getElementById("startStopBtn").textContent = "▶ Start";
+      document.getElementById("startStopBtn").className = "btn-start";
+      document.getElementById("timerStatus").textContent = "Ready";
+    }
+
+    // 4. Load & Render Data
     async function loadAll() {
       const { data: logs, error: logErr } = await db
         .from("study_logs")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(30);
-
-      const logsEl = document.getElementById("logsList");
-      const boardEl = document.getElementById("boardList");
-
-      if (logErr) {
-        logsEl.innerHTML = `<span style="color:#f87171;">Error: ${logErr.message}</span>`;
-      } else if (!logs.length) {
-        logsEl.textContent = "No study logs yet. Be the first to log a session!";
-        boardEl.textContent = "No data yet.";
-      } else {
-        logsEl.innerHTML = logs.map(l => `
-          <div class="item">
-            <div>
-              <strong>${escapeHtml(l.student_name)}</strong> · ${escapeHtml(l.subject)}<br/>
-              <span style="color:var(--muted); font-size:0.88rem;">${escapeHtml(l.topic)} (${l.minutes} mins)</span>
-            </div>
-            <span class="badge ${l.status === 'Needs Revision' ? 'rev' : ''}">${escapeHtml(l.status)}</span>
-          </div>
-        `).join("");
-
-        const totals = {};
-        logs.forEach(l => {
-          const key = l.student_name.trim();
-          totals[key] = (totals[key] || 0) + (l.minutes || 0);
-        });
-        const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-        boardEl.innerHTML = sorted.map(([name, mins], i) => `
-          <div class="stat-row">
-            <span>#${i + 1} <strong>${escapeHtml(name)}</strong></span>
-            <span>${(mins / 60).toFixed(1)} hrs (${mins}m)</span>
-          </div>
-        `).join("");
-      }
+        .limit(100);
 
       const { data: dls, error: dlErr } = await db
         .from("deadlines")
         .select("*")
         .order("due_date", { ascending: true });
 
-      const dlEl = document.getElementById("deadlinesList");
-      if (dlErr) {
-        dlEl.innerHTML = `<span style="color:#f87171;">Error: ${dlErr.message}</span>`;
-      } else if (!dls.length) {
-        dlEl.textContent = "No deadlines added yet.";
+      if (logErr) {
+        document.getElementById("logsList").innerHTML = `<span style="color:#f87171;">Error: ${logErr.message}</span>`;
       } else {
-        dlEl.innerHTML = dls.map(d => `
+        allLogs = logs || [];
+        renderStatsAndLogs();
+      }
+
+      if (dlErr) {
+        document.getElementById("deadlinesList").innerHTML = `<span style="color:#f87171;">Error: ${dlErr.message}</span>`;
+      } else {
+        allDeadlines = dls || [];
+        renderDeadlines();
+      }
+    }
+
+    function renderStatsAndLogs() {
+      const myName = document.getElementById("studentName").value.trim().toLowerCase();
+      const myLogs = myName
+        ? allLogs.filter(l => (l.student_name || "").trim().toLowerCase() === myName)
+        : allLogs;
+
+      const totalMins = myLogs.reduce((sum, l) => sum + (l.minutes || 0), 0);
+      document.getElementById("statHours").textContent = (totalMins / 60).toFixed(1) + "h";
+      document.getElementById("statSessions").textContent = myLogs.length;
+
+      // Subject filter pills
+      const subjects = ["ALL", ...new Set(allLogs.map(l => (l.subject || "").trim().toUpperCase()).filter(Boolean))];
+      document.getElementById("subjectPills").innerHTML = subjects.map(sub => `
+        <button class="pill ${selectedSubject === sub ? 'active' : ''}" onclick="setSubjectFilter('${escapeHtml(sub)}')">
+          ${escapeHtml(sub)}
+        </button>
+      `).join("");
+
+      const filtered = selectedSubject === "ALL"
+        ? allLogs
+        : allLogs.filter(l => (l.subject || "").trim().toUpperCase() === selectedSubject);
+
+      const logsEl = document.getElementById("logsList");
+      if (!filtered.length) {
+        logsEl.textContent = "No study logs yet. Start the timer or log a session above!";
+      } else {
+        logsEl.innerHTML = filtered.slice(0, 35).map(l => `
           <div class="item">
             <div>
-              <strong>${escapeHtml(d.subject)}</strong>: ${escapeHtml(d.title)}<br/>
-              <span style="color:var(--muted); font-size:0.85rem;">Due: ${d.due_date}</span>
+              <strong>${escapeHtml(l.student_name)}</strong> · ${escapeHtml(l.subject.toUpperCase())}<br/>
+              <span style="color:var(--muted); font-size:0.85rem;">${escapeHtml(l.topic)} (${l.minutes} mins)</span>
             </div>
+            <div class="item-actions">
+              <span class="badge ${l.status === 'Needs Revision' ? 'rev' : 'ok'}">${escapeHtml(l.status)}</span>
+              ${l.id ? `<button class="del-btn" title="Delete" onclick="deleteLog(${l.id})">🗑️</button>` : ""}
+            </div>
+          </div>
+        `).join("");
+      }
+
+      // Leaderboard
+      const boardEl = document.getElementById("boardList");
+      if (!allLogs.length) {
+        boardEl.textContent = "No data yet.";
+      } else {
+        const totals = {};
+        allLogs.forEach(l => {
+          const key = (l.student_name || "Student").trim();
+          totals[key] = (totals[key] || 0) + (l.minutes || 0);
+        });
+        const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+        boardEl.innerHTML = sorted.map(([name, mins], i) => `
+          <div class="stat-row">
+            <span>${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`} <strong>${escapeHtml(name)}</strong></span>
+            <span>${(mins / 60).toFixed(1)} hrs (${mins}m)</span>
           </div>
         `).join("");
       }
     }
 
+    function setSubjectFilter(sub) {
+      selectedSubject = sub;
+      renderStatsAndLogs();
+    }
+
+    function getDueBadge(dueStr) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const due = new Date(dueStr + "T00:00:00");
+      const diffDays = Math.round((due - today) / 86400000);
+      if (diffDays < 0) return `<span class="badge overdue">Overdue (${Math.abs(diffDays)}d)</span>`;
+      if (diffDays === 0) return `<span class="badge overdue">Due Today</span>`;
+      if (diffDays <= 3) return `<span class="badge due-soon">${diffDays}d left</span>`;
+      return `<span class="badge ok">${diffDays}d left</span>`;
+    }
+
+    function renderDeadlines() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const upcomingCount = allDeadlines.filter(d => new Date(d.due_date + "T00:00:00") >= today).length;
+      document.getElementById("statDue").textContent = upcomingCount;
+
+      const dlEl = document.getElementById("deadlinesList");
+      if (!allDeadlines.length) {
+        dlEl.textContent = "No deadlines added yet.";
+        return;
+      }
+      dlEl.innerHTML = allDeadlines.map(d => `
+        <div class="item">
+          <div>
+            <strong>${escapeHtml(d.subject.toUpperCase())}</strong>: ${escapeHtml(d.title)}<br/>
+            <span style="color:var(--muted); font-size:0.82rem;">Due: ${d.due_date}</span>
+          </div>
+          <div class="item-actions">
+            ${getDueBadge(d.due_date)}
+            ${d.id ? `<button class="del-btn" title="Delete" onclick="deleteDeadline(${d.id})">🗑️</button>` : ""}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 5. CRUD Operations
     async function addLog() {
       const student_name = document.getElementById("studentName").value.trim();
-      const subject = document.getElementById("subject").value.trim();
+      const subject = document.getElementById("subject").value.trim().toUpperCase();
       const topic = document.getElementById("topic").value.trim();
       const minutes = parseInt(document.getElementById("minutes").value, 10);
       const status = document.getElementById("status").value;
@@ -240,8 +551,15 @@
       }
     }
 
+    async function deleteLog(id) {
+      if (!confirm("Delete this study log?")) return;
+      const { error } = await db.from("study_logs").delete().eq("id", id);
+      if (error) alert("Error deleting: " + error.message);
+      else loadAll();
+    }
+
     async function addDeadline() {
-      const subject = document.getElementById("dlSubject").value.trim();
+      const subject = document.getElementById("dlSubject").value.trim().toUpperCase();
       const title = document.getElementById("dlTitle").value.trim();
       const due_date = document.getElementById("dlDate").value;
 
@@ -257,6 +575,81 @@
         document.getElementById("dlSubject").value = "";
         document.getElementById("dlTitle").value = "";
         document.getElementById("dlDate").value = "";
+        loadAll();
+      }
+    }
+
+    async function deleteDeadline(id) {
+      if (!confirm("Remove this deadline?")) return;
+      const { error } = await db.from("deadlines").delete().eq("id", id);
+      if (error) alert("Error deleting: " + error.message);
+      else loadAll();
+    }
+
+    // 6. Quick Paste-to-Import from VULMS
+    async function importFromLms() {
+      const raw = document.getElementById("lmsPaste").value.trim();
+      if (!raw) {
+        alert("Paste your VULMS assignment/quiz text first.");
+        return;
+      }
+
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const parsed = [];
+      const months = { jan:"01", feb:"02", mar:"03", apr:"04", may:"05", jun:"06", jul:"07", aug:"08", sep:"09", oct:"10", nov:"11", dec:"12" };
+
+      lines.forEach(line => {
+        const codeMatch = line.match(/\b([A-Z]{2,4}\d{3})\b/i);
+        if (!codeMatch) return;
+        const subject = codeMatch[1].toUpperCase();
+
+        // Match YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY, or "Nov 28, 2026"
+        let due_date = null;
+        const isoMatch = line.match(/\b(20\d{2})[-/](\d{1,2})[-/](\d{1,2})\b/);
+        const dmyMatch = line.match(/\b(\d{1,2})[-/](\d{1,2})[-/](20\d{2})\b/);
+        const textDateMatch = line.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2}),?\s+(20\d{2})\b/i);
+
+        if (isoMatch) {
+          due_date = `${isoMatch[1]}-${isoMatch[2].padStart(2,"0")}-${isoMatch[3].padStart(2,"0")}`;
+        } else if (dmyMatch) {
+          due_date = `${dmyMatch[3]}-${dmyMatch[2].padStart(2,"0")}-${dmyMatch[1].padStart(2,"0")}`;
+        } else if (textDateMatch) {
+          const m = months[textDateMatch[1].slice(0,3).toLowerCase()];
+          due_date = `${textDateMatch[3]}-${m}-${textDateMatch[2].padStart(2,"0")}`;
+        }
+
+        if (!due_date) return;
+
+        let title = line
+          .replace(codeMatch[0], "")
+          .replace(/due\s*date\s*:?/i, "")
+          .replace(/due\s*:?/i, "")
+          .replace(/(20\d{2}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]20\d{2}|(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+20\d{2})/i, "")
+          .replace(/^[-:\s]+|[-:\s]+$/g, "")
+          .trim();
+
+        if (!title) title = "LMS Activity";
+        parsed.push({ subject, title, due_date });
+      });
+
+      if (!parsed.length) {
+        alert("Could not find any course code (like CS201) + due date in that text. Check the format and try again.");
+        return;
+      }
+
+      const btn = document.getElementById("importLmsBtn");
+      btn.disabled = true;
+      btn.textContent = `Importing ${parsed.length}...`;
+
+      const { error } = await db.from("deadlines").insert(parsed);
+      btn.disabled = false;
+      btn.textContent = "✨ Extract & Save Deadlines";
+
+      if (error) {
+        alert("Error importing: " + error.message);
+      } else {
+        document.getElementById("lmsPaste").value = "";
+        alert(`Imported ${parsed.length} deadline(s)!`);
         loadAll();
       }
     }

@@ -28,11 +28,11 @@
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0; background: var(--bg); color: var(--text);
-      padding: 16px 16px 88px; max-width: 600px; margin-inline: auto;
+      padding: 16px 16px 92px; max-width: 920px; margin-inline: auto;
     }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     h1 { font-size: 1.35rem; margin: 0 0 2px; }
-    p.sub { color: var(--muted); font-size: 0.85rem; margin: 0; }
+    p.sub { color: var(--muted); font-size: 0.84rem; margin: 0; }
     #installBtn {
       display: none; background: rgba(56, 189, 248, 0.15); color: var(--accent);
       border: 1px solid var(--accent); border-radius: 999px; padding: 6px 12px;
@@ -41,56 +41,162 @@
 
     /* Stats Grid */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 12px;
     }
     .stat-box {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 10px 8px; text-align: center;
+      border-radius: 12px; padding: 9px 6px; text-align: center;
     }
-    .stat-val { font-size: 1.15rem; font-weight: 800; color: var(--accent); }
-    .stat-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .stat-val { font-size: 1.05rem; font-weight: 800; color: var(--accent); }
+    .stat-lbl { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+    /* Daily Goal Bar */
+    .goal-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 11px 14px; margin-bottom: 14px;
+    }
+    .goal-top { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; margin-bottom: 7px; }
+    .goal-edit {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 6px; padding: 3px 8px; font-size: 0.72rem; cursor: pointer;
+    }
+    .progress-track {
+      width: 100%; height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-dark), var(--success));
+      border-radius: 999px; transition: width 0.35s ease;
+    }
 
     /* Bottom App Nav */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+      background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(10px);
       border-top: 1px solid var(--border);
       display: flex; justify-content: space-around; padding: 8px 12px;
-      max-width: 600px; margin: 0 auto; z-index: 50;
+      max-width: 920px; margin: 0 auto; z-index: 50;
     }
     .nav-btn {
       flex: 1; background: none; border: none; color: var(--muted);
       display: flex; flex-direction: column; align-items: center; gap: 3px;
-      font-size: 0.75rem; font-weight: 600; cursor: pointer; padding: 4px;
+      font-size: 0.72rem; font-weight: 600; cursor: pointer; padding: 4px;
     }
-    .nav-btn span.ico { font-size: 1.2rem; }
+    .nav-btn span.ico { font-size: 1.15rem; }
     .nav-btn.active { color: var(--accent); }
 
     .card {
       background: var(--card); border: 1px solid var(--border);
       border-radius: 14px; padding: 16px; margin-bottom: 14px;
     }
-    .card-title { font-weight: 700; font-size: 0.98rem; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .card-title {
+      font-weight: 700; font-size: 0.96rem; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    }
+
+    /* Subject Columns Grid */
+    .subjects-columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .subj-col {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .subj-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .subj-code {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.84rem;
+    }
+    .metric-label { color: var(--muted); font-weight: 600; }
+    .metric-controls { display: flex; align-items: center; gap: 6px; }
+    .step-btn {
+      width: 26px; height: 26px; border-radius: 7px;
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--text); font-weight: 800; cursor: pointer;
+    }
+    .step-btn:active { border-color: var(--accent); color: var(--accent); }
+    .metric-val { min-width: 26px; text-align: center; font-weight: 800; font-size: 0.95rem; }
+    .exam-box {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+    .exam-box input[type="date"] {
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      font-size: 0.84rem;
+    }
+    .exam-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    /* Subject Quick-Pick Chips */
+    .subject-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;
+    }
+    .sub-chip {
+      padding: 8px 6px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; text-align: center; transition: all 0.15s ease;
+    }
+    .sub-chip.selected {
+      background: var(--accent-dark); border-color: var(--accent); color: #fff;
+    }
 
     /* Focus Timer */
     .timer-presets { display: flex; gap: 6px; margin-bottom: 10px; }
     .preset-btn {
       flex: 1; padding: 6px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--muted); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      background: var(--bg); color: var(--muted); font-size: 0.78rem; font-weight: 600; cursor: pointer;
     }
     .preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(56, 189, 248, 0.1); }
     .timer-display {
-      font-size: 2.3rem; font-weight: 800; text-align: center;
-      font-variant-numeric: tabular-nums; letter-spacing: 1px; margin: 8px 0 12px;
+      font-size: 2.35rem; font-weight: 800; text-align: center;
+      font-variant-numeric: tabular-nums; letter-spacing: 1px; margin: 6px 0 12px;
     }
     .timer-controls { display: flex; gap: 8px; }
     .timer-controls button {
       flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border);
-      font-weight: 700; cursor: pointer; font-size: 0.9rem;
+      font-weight: 700; cursor: pointer; font-size: 0.88rem;
     }
     .btn-start { background: var(--success); color: #052e16; border: none !important; }
     .btn-pause { background: var(--warn); color: #451a03; border: none !important; }
     .btn-reset { background: var(--bg); color: var(--text); }
+
+    /* Quick Minute Pills */
+    .min-chips { display: flex; gap: 6px; margin-bottom: 10px; }
+    .min-chip {
+      flex: 1; padding: 6px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--muted); font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    }
 
     label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
     input, select, textarea {
@@ -116,7 +222,7 @@
     .pills::-webkit-scrollbar { display: none; }
     .pill {
       padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--muted); font-size: 0.78rem; font-weight: 600;
+      background: var(--bg); color: var(--muted); font-size: 0.76rem; font-weight: 700;
       white-space: nowrap; cursor: pointer;
     }
     .pill.active { background: var(--accent-dark); border-color: var(--accent); color: #fff; }
@@ -126,25 +232,47 @@
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
     .item:last-child { border-bottom: none; }
-    .item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .item-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
     .badge {
-      font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;
+      font-size: 0.7rem; padding: 3px 8px; border-radius: 999px;
       background: rgba(56, 189, 248, 0.15); color: var(--accent); font-weight: 700;
+      border: none; cursor: pointer;
     }
-    .badge.rev { background: rgba(245, 158, 11, 0.15); color: var(--warn); }
-    .badge.ok { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .badge.rev { background: rgba(245, 158, 11, 0.16); color: var(--warn); }
+    .badge.ok { background: rgba(34, 197, 94, 0.16); color: var(--success); }
     .badge.due-soon { background: rgba(245, 158, 11, 0.18); color: var(--warn); }
     .badge.overdue { background: rgba(239, 68, 68, 0.18); color: #f87171; }
 
-    .del-btn {
+    .icon-btn {
       background: transparent; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 8px; padding: 4px 7px; font-size: 0.78rem; cursor: pointer;
+      border-radius: 8px; padding: 4px 7px; font-size: 0.76rem; cursor: pointer;
     }
-    .del-btn:hover { border-color: var(--danger); color: #f87171; }
+    .icon-btn:hover { border-color: var(--accent); color: var(--text); }
+    .icon-btn.del:hover { border-color: var(--danger); color: #f87171; }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
     .stat-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); }
     .stat-row:last-child { border-bottom: none; }
+
+    /* Modal & Toast */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(2, 6, 23, 0.8);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px; z-index: 100;
+    }
+    .modal-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px; width: 100%; max-width: 420px;
+    }
+    .toast {
+      position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: #f8fafc; border: 1px solid var(--accent);
+      padding: 9px 16px; border-radius: 999px; font-size: 0.84rem; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45); z-index: 120;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -152,7 +280,7 @@
   <header>
     <div>
       <h1>📚 Safe Study</h1>
-      <p class="sub">Study tracker, focus timer & LMS deadlines</p>
+      <p class="sub">CS201 · CS302 · STA301 · PAK302 · ENG201 · ISL202</p>
     </div>
     <button id="installBtn">📲 Install App</button>
   </header>
@@ -161,15 +289,30 @@
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-val" id="statHours">0.0h</div>
-      <div class="stat-lbl">Your Study Time</div>
+      <div class="stat-lbl">Total Hours</div>
     </div>
     <div class="stat-box">
-      <div class="stat-val" id="statSessions">0</div>
-      <div class="stat-lbl">Sessions</div>
+      <div class="stat-val" id="statToday">0m</div>
+      <div class="stat-lbl">Today</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" id="statStreak">0d</div>
+      <div class="stat-lbl">Streak</div>
     </div>
     <div class="stat-box">
       <div class="stat-val" id="statDue">0</div>
-      <div class="stat-lbl">Upcoming Due</div>
+      <div class="stat-lbl">Due Soon</div>
+    </div>
+  </div>
+
+  <!-- DAILY GOAL PROGRESS -->
+  <div class="goal-card">
+    <div class="goal-top">
+      <span id="goalText">Daily Goal: <strong>0 / 120 mins</strong> (0%)</span>
+      <button class="goal-edit" onclick="changeDailyGoal()">Edit Goal</button>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="goalBar"></div>
     </div>
   </div>
 
@@ -199,13 +342,20 @@
       <label>Your Name</label>
       <input id="studentName" placeholder="e.g., Hannan" oninput="renderStatsAndLogs()" />
 
-      <label>Subject / Course</label>
-      <input id="subject" placeholder="e.g., CS201 / MTH101" />
+      <label>Tap Subject / Course</label>
+      <div class="subject-grid" id="logSubjectChips"></div>
+      <input id="subject" placeholder="Or type another course code..." oninput="syncChipHighlight('logSubjectChips', this.value)" />
 
-      <label>Topic Covered</label>
-      <input id="topic" placeholder="e.g., Loops & Arrays" />
+      <label>Topic / Lecture Covered</label>
+      <input id="topic" placeholder="e.g., Lecture 12 - Pointers & Arrays" />
 
       <label>Minutes Studied</label>
+      <div class="min-chips">
+        <button type="button" class="min-chip" onclick="setQuickMins(15)">+15m</button>
+        <button type="button" class="min-chip" onclick="setQuickMins(30)">+30m</button>
+        <button type="button" class="min-chip" onclick="setQuickMins(45)">+45m</button>
+        <button type="button" class="min-chip" onclick="setQuickMins(60)">+60m</button>
+      </div>
       <input id="minutes" type="number" placeholder="45" />
 
       <label>Status</label>
@@ -218,28 +368,45 @@
     </div>
 
     <div class="card">
-      <div class="card-title"><span>Recent Class Activity</span></div>
+      <div class="card-title">
+        <span>Recent Class Activity</span>
+        <span style="font-size:0.72rem; color:var(--muted);">Tap badge to toggle status</span>
+      </div>
+      <input id="searchLogs" placeholder="🔍 Search topic, course, or student..." oninput="renderStatsAndLogs()" style="margin-bottom:10px; padding:8px 11px; font-size:0.88rem;" />
       <div class="pills" id="subjectPills"></div>
       <div id="logsList" style="color: var(--muted);">Loading...</div>
     </div>
   </div>
 
-  <!-- TAB 2: DEADLINES + VULMS PASTE IMPORT -->
+  <!-- TAB 2: SEPARATE SUBJECT COLUMNS -->
+  <div id="tab-subjects" class="hidden">
+    <div class="card" style="padding:12px 16px;">
+      <div class="card-title" style="margin-bottom:4px;">
+        <span>🗂️ Subject Columns</span>
+        <span style="font-size:0.74rem; color:var(--muted);">Auto-saves to cloud & device</span>
+      </div>
+      <p class="sub">Track topics covered, remaining quizzes, assignments, GDBs, and exam dates per subject.</p>
+    </div>
+    <div class="subjects-columns" id="subjectColumnsGrid"></div>
+  </div>
+
+  <!-- TAB 3: DEADLINES + VULMS PASTE IMPORT -->
   <div id="tab-deadlines" class="hidden">
     <div class="card">
       <div class="card-title"><span>⚡ Quick Import from VULMS</span></div>
       <label>Paste copied text from VULMS Assignments / Quizzes / GDBs</label>
-      <textarea id="lmsPaste" placeholder="Example:&#10;CS201 - Assignment No. 1 Due Date: Nov 28, 2026&#10;MTH101 - Quiz 2 Due: 2026-12-02"></textarea>
+      <textarea id="lmsPaste" placeholder="Example:&#10;CS201 - Assignment No. 1 Due Date: Nov 28, 2026&#10;STA301 - Quiz 2 Due: 2026-12-02"></textarea>
       <button class="secondary" id="importLmsBtn" onclick="importFromLms()">✨ Extract & Save Deadlines</button>
     </div>
 
     <div class="card">
       <div class="card-title"><span>➕ Add Single Deadline</span></div>
-      <label>Subject</label>
-      <input id="dlSubject" placeholder="e.g., MTH101" />
+      <label>Tap Subject</label>
+      <div class="subject-grid" id="dlSubjectChips"></div>
+      <input id="dlSubject" placeholder="Or type another course..." oninput="syncChipHighlight('dlSubjectChips', this.value)" />
 
-      <label>Assignment / Quiz Title</label>
-      <input id="dlTitle" placeholder="e.g., Quiz 1" />
+      <label>Assignment / Quiz / GDB Title</label>
+      <input id="dlTitle" placeholder="e.g., Assignment 1 / Quiz 2" />
 
       <label>Due Date</label>
       <input id="dlDate" type="date" />
@@ -248,33 +415,75 @@
     </div>
 
     <div class="card">
-      <div class="card-title"><span>📅 Upcoming Deadlines</span></div>
+      <div class="card-title">
+        <span>📅 Upcoming Deadlines</span>
+        <button class="goal-edit" id="toggleOverdueBtn" onclick="toggleHideOverdue()">Hide Overdue</button>
+      </div>
       <div id="deadlinesList" style="color: var(--muted);">Loading...</div>
     </div>
   </div>
 
-  <!-- TAB 3: LEADERBOARD -->
+  <!-- TAB 4: LEADERBOARD & SHARE -->
   <div id="tab-board" class="hidden">
     <div class="card">
-      <div class="card-title"><span>🏆 Total Study Time by Student</span></div>
+      <div class="card-title">
+        <span>🏆 Total Study Time</span>
+        <button class="goal-edit" onclick="shareSummary()">📋 Copy Summary</button>
+      </div>
       <div id="boardList" style="color: var(--muted);">Loading...</div>
     </div>
+
+    <div class="card">
+      <div class="card-title"><span>📊 Your Breakdown by Subject</span></div>
+      <div id="subjectBreakdown" style="color: var(--muted);">Loading...</div>
+    </div>
   </div>
+
+  <!-- EDIT LOG MODAL -->
+  <div id="editModal" class="modal-backdrop hidden" onclick="if(event.target===this) closeEditModal()">
+    <div class="modal-card">
+      <div class="card-title">
+        <span>✏️ Edit Study Log</span>
+        <button class="icon-btn" onclick="closeEditModal()">✕</button>
+      </div>
+      <input type="hidden" id="editLogId" />
+      <label>Subject</label>
+      <input id="editSubject" />
+      <label>Topic</label>
+      <input id="editTopic" />
+      <label>Minutes</label>
+      <input id="editMinutes" type="number" />
+      <label>Status</label>
+      <select id="editStatus">
+        <option value="Completed">Completed</option>
+        <option value="Needs Revision">Needs Revision</option>
+      </select>
+      <button class="primary" onclick="saveEditLog()">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast"></div>
 
   <!-- BOTTOM APP NAVIGATION -->
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="showTab('logs', this)">
       <span class="ico">📖</span><span>Study</span>
     </button>
+    <button class="nav-btn" onclick="showTab('subjects', this)">
+      <span class="ico">🗂️</span><span>Subjects</span>
+    </button>
     <button class="nav-btn" onclick="showTab('deadlines', this)">
       <span class="ico">⏰</span><span>Deadlines</span>
     </button>
     <button class="nav-btn" onclick="showTab('board', this)">
-      <span class="ico">🏆</span><span>Leaderboard</span>
+      <span class="ico">🏆</span><span>Progress</span>
     </button>
   </nav>
 
   <script>
+    const MY_SUBJECTS = ["CS201", "CS302", "STA301", "PAK302", "ENG201", "ISL202"];
+
     // 1. PWA Service Worker & Install Prompt
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").catch(() => {});
@@ -301,17 +510,97 @@
 
     let allLogs = [];
     let allDeadlines = [];
+    let subjectTrackers = {};
     let selectedSubject = "ALL";
+    let hideOverdue = false;
+    let dailyGoal = parseInt(localStorage.getItem("dailyGoal") || "120", 10);
 
-    const savedName = localStorage.getItem("studentName");
-    if (savedName) document.getElementById("studentName").value = savedName;
+    const savedName = localStorage.getItem("studentName") || "Hannan";
+    document.getElementById("studentName").value = savedName;
+
+    function defaultTrackers() {
+      const map = {};
+      MY_SUBJECTS.forEach(code => {
+        map[code] = {
+          subject: code,
+          topics_covered: 0,
+          remaining_quizzes: 0,
+          remaining_assignments: 0,
+          remaining_gdbs: 0,
+          exam_date: ""
+        };
+      });
+      return map;
+    }
+
+    function loadLocalTrackers() {
+      const base = defaultTrackers();
+      try {
+        const raw = JSON.parse(localStorage.getItem("subjectTrackers") || "{}");
+        Object.keys(raw).forEach(k => {
+          if (base[k]) base[k] = { ...base[k], ...raw[k] };
+        });
+      } catch (_) {}
+      return base;
+    }
+
+    subjectTrackers = loadLocalTrackers();
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+    }
+
+    function initSubjectChips() {
+      const logContainer = document.getElementById("logSubjectChips");
+      const dlContainer = document.getElementById("dlSubjectChips");
+      logContainer.innerHTML = MY_SUBJECTS.map(s =>
+        `<button type="button" class="sub-chip" onclick="pickSubject('subject', 'logSubjectChips', '${s}')">${s}</button>`
+      ).join("");
+      dlContainer.innerHTML = MY_SUBJECTS.map(s =>
+        `<button type="button" class="sub-chip" onclick="pickSubject('dlSubject', 'dlSubjectChips', '${s}')">${s}</button>`
+      ).join("");
+    }
+
+    function pickSubject(inputId, containerId, code) {
+      document.getElementById(inputId).value = code;
+      syncChipHighlight(containerId, code);
+    }
+
+    function syncChipHighlight(containerId, val) {
+      const upper = (val || "").trim().toUpperCase();
+      document.querySelectorAll(`#${containerId} .sub-chip`).forEach(btn => {
+        btn.classList.toggle("selected", btn.textContent === upper);
+      });
+    }
+
+    function setQuickMins(mins) {
+      const el = document.getElementById("minutes");
+      const current = parseInt(el.value || "0", 10);
+      el.value = current + mins;
+      showToast(`Minutes set to ${el.value}m`);
+    }
 
     function showTab(name, btn) {
       document.querySelectorAll(".nav-btn").forEach(t => t.classList.remove("active"));
       btn.classList.add("active");
-      ["logs", "deadlines", "board"].forEach(id => {
+      ["logs", "subjects", "deadlines", "board"].forEach(id => {
         document.getElementById("tab-" + id).classList.toggle("hidden", id !== name);
       });
+    }
+
+    function changeDailyGoal() {
+      const val = prompt("Set your daily study goal (in minutes):", dailyGoal);
+      const num = parseInt(val, 10);
+      if (num && num > 0) {
+        dailyGoal = num;
+        localStorage.setItem("dailyGoal", String(dailyGoal));
+        renderStatsAndLogs();
+        showToast(`Daily goal updated to ${dailyGoal} mins`);
+      }
     }
 
     // 3. Focus / Pomodoro Timer
@@ -368,7 +657,7 @@
             btn.className = "btn-start";
             document.getElementById("timerStatus").textContent = "Session Complete!";
             document.getElementById("minutes").value = presetMinutes;
-            alert(`Focus session complete! ${presetMinutes} minutes filled into your log.`);
+            showToast(`🎉 ${presetMinutes} mins added to your log!`);
           }
         }
       }, 1000);
@@ -378,6 +667,7 @@
       const mins = Math.max(1, Math.round(elapsedSeconds / 60));
       document.getElementById("minutes").value = mins;
       document.getElementById("timerStatus").textContent = `Applied ${mins}m`;
+      showToast(`Filled ${mins} minutes`);
     }
 
     function resetTimer() {
@@ -391,18 +681,135 @@
       document.getElementById("timerStatus").textContent = "Ready";
     }
 
-    // 4. Load & Render Data
+    // 4. Subject Columns (Topics, Quizzes, Assignments, GDBs, Exam Date)
+    function renderSubjectColumns() {
+      const grid = document.getElementById("subjectColumnsGrid");
+      grid.innerHTML = MY_SUBJECTS.map(code => {
+        const t = subjectTrackers[code] || defaultTrackers()[code];
+        const loggedCount = allLogs.filter(l => (l.subject || "").trim().toUpperCase() === code).length;
+        const examBadge = t.exam_date ? getDueBadge(t.exam_date) : `<span class="badge">No Exam Date</span>`;
+
+        return `
+          <div class="subj-col">
+            <div class="subj-header">
+              <span class="subj-code">${code}</span>
+              <span style="font-size:0.74rem; color:var(--muted);">${loggedCount} logs</span>
+            </div>
+
+            <div class="metric-row">
+              <span class="metric-label">Topics Covered</span>
+              <div class="metric-controls">
+                <button class="step-btn" onclick="stepMetric('${code}', 'topics_covered', -1)">−</button>
+                <span class="metric-val">${t.topics_covered}</span>
+                <button class="step-btn" onclick="stepMetric('${code}', 'topics_covered', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="metric-row">
+              <span class="metric-label">Remaining Quizzes</span>
+              <div class="metric-controls">
+                <button class="step-btn" onclick="stepMetric('${code}', 'remaining_quizzes', -1)">−</button>
+                <span class="metric-val">${t.remaining_quizzes}</span>
+                <button class="step-btn" onclick="stepMetric('${code}', 'remaining_quizzes', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="metric-row">
+              <span class="metric-label">Remaining Assignments</span>
+              <div class="metric-controls">
+                <button class="step-btn" onclick="stepMetric('${code}', 'remaining_assignments', -1)">−</button>
+                <span class="metric-val">${t.remaining_assignments}</span>
+                <button class="step-btn" onclick="stepMetric('${code}', 'remaining_assignments', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="metric-row">
+              <span class="metric-label">Remaining GDBs</span>
+              <div class="metric-controls">
+                <button class="step-btn" onclick="stepMetric('${code}', 'remaining_gdbs', -1)">−</button>
+                <span class="metric-val">${t.remaining_gdbs}</span>
+                <button class="step-btn" onclick="stepMetric('${code}', 'remaining_gdbs', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="exam-box">
+              <label style="margin-bottom:4px;">Exam Date</label>
+              <input type="date" value="${t.exam_date || ""}" onchange="setExamDate('${code}', this.value)" />
+              <div class="exam-footer">
+                <span>${t.exam_date ? `Exam: ${t.exam_date}` : "Set exam date"}</span>
+                ${examBadge}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function persistTracker(code) {
+      localStorage.setItem("subjectTrackers", JSON.stringify(subjectTrackers));
+      const row = subjectTrackers[code];
+      const payload = {
+        subject: code,
+        topics_covered: row.topics_covered,
+        remaining_quizzes: row.remaining_quizzes,
+        remaining_assignments: row.remaining_assignments,
+        remaining_gdbs: row.remaining_gdbs,
+        exam_date: row.exam_date || null,
+        updated_at: new Date().toISOString()
+      };
+      await db.from("subject_trackers").upsert(payload, { onConflict: "subject" });
+    }
+
+    async function stepMetric(code, field, delta) {
+      const current = subjectTrackers[code][field] || 0;
+      const next = Math.max(0, current + delta);
+      subjectTrackers[code][field] = next;
+      renderSubjectColumns();
+      await persistTracker(code);
+      showToast(`${code} updated`);
+    }
+
+    async function setExamDate(code, dateVal) {
+      subjectTrackers[code].exam_date = dateVal;
+      renderSubjectColumns();
+      await persistTracker(code);
+      showToast(`${code} exam date saved`);
+    }
+
+    // 5. Load & Render Data
     async function loadAll() {
       const { data: logs, error: logErr } = await db
         .from("study_logs")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(100);
+        .limit(150);
 
       const { data: dls, error: dlErr } = await db
         .from("deadlines")
         .select("*")
         .order("due_date", { ascending: true });
+
+      const { data: trackers } = await db
+        .from("subject_trackers")
+        .select("*");
+
+      if (trackers && trackers.length) {
+        const merged = loadLocalTrackers();
+        trackers.forEach(tr => {
+          if (merged[tr.subject]) {
+            merged[tr.subject] = {
+              subject: tr.subject,
+              topics_covered: tr.topics_covered ?? merged[tr.subject].topics_covered,
+              remaining_quizzes: tr.remaining_quizzes ?? merged[tr.subject].remaining_quizzes,
+              remaining_assignments: tr.remaining_assignments ?? merged[tr.subject].remaining_assignments,
+              remaining_gdbs: tr.remaining_gdbs ?? merged[tr.subject].remaining_gdbs,
+              exam_date: tr.exam_date || merged[tr.subject].exam_date || ""
+            };
+          }
+        });
+        subjectTrackers = merged;
+        localStorage.setItem("subjectTrackers", JSON.stringify(subjectTrackers));
+      }
 
       if (logErr) {
         document.getElementById("logsList").innerHTML = `<span style="color:#f87171;">Error: ${logErr.message}</span>`;
@@ -417,6 +824,28 @@
         allDeadlines = dls || [];
         renderDeadlines();
       }
+
+      renderSubjectColumns();
+    }
+
+    function computeStreak(logs) {
+      if (!logs.length) return 0;
+      const days = new Set(
+        logs
+          .filter(l => l.created_at)
+          .map(l => new Date(l.created_at).toLocaleDateString("en-CA"))
+      );
+      let streak = 0;
+      const cursor = new Date();
+      const todayKey = cursor.toLocaleDateString("en-CA");
+      if (!days.has(todayKey)) {
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      while (days.has(cursor.toLocaleDateString("en-CA"))) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return streak;
     }
 
     function renderStatsAndLogs() {
@@ -426,40 +855,61 @@
         : allLogs;
 
       const totalMins = myLogs.reduce((sum, l) => sum + (l.minutes || 0), 0);
-      document.getElementById("statHours").textContent = (totalMins / 60).toFixed(1) + "h";
-      document.getElementById("statSessions").textContent = myLogs.length;
+      const todayStr = new Date().toLocaleDateString("en-CA");
+      const todayMins = myLogs
+        .filter(l => l.created_at && new Date(l.created_at).toLocaleDateString("en-CA") === todayStr)
+        .reduce((sum, l) => sum + (l.minutes || 0), 0);
 
-      // Subject filter pills
-      const subjects = ["ALL", ...new Set(allLogs.map(l => (l.subject || "").trim().toUpperCase()).filter(Boolean))];
+      document.getElementById("statHours").textContent = (totalMins / 60).toFixed(1) + "h";
+      document.getElementById("statToday").textContent = todayMins + "m";
+      document.getElementById("statStreak").textContent = computeStreak(myLogs) + "d";
+
+      const pct = Math.min(100, Math.round((todayMins / dailyGoal) * 100));
+      document.getElementById("goalText").innerHTML =
+        `Daily Goal: <strong>${todayMins} / ${dailyGoal} mins</strong> (${pct}%)`;
+      document.getElementById("goalBar").style.width = pct + "%";
+
+      const dynamicSubs = allLogs.map(l => (l.subject || "").trim().toUpperCase()).filter(Boolean);
+      const subjects = ["ALL", ...new Set([...MY_SUBJECTS, ...dynamicSubs])];
       document.getElementById("subjectPills").innerHTML = subjects.map(sub => `
         <button class="pill ${selectedSubject === sub ? 'active' : ''}" onclick="setSubjectFilter('${escapeHtml(sub)}')">
           ${escapeHtml(sub)}
         </button>
       `).join("");
 
-      const filtered = selectedSubject === "ALL"
-        ? allLogs
-        : allLogs.filter(l => (l.subject || "").trim().toUpperCase() === selectedSubject);
+      const query = (document.getElementById("searchLogs").value || "").trim().toLowerCase();
+      const filtered = allLogs.filter(l => {
+        const subMatch = selectedSubject === "ALL" || (l.subject || "").trim().toUpperCase() === selectedSubject;
+        const textMatch = !query ||
+          (l.topic || "").toLowerCase().includes(query) ||
+          (l.subject || "").toLowerCase().includes(query) ||
+          (l.student_name || "").toLowerCase().includes(query);
+        return subMatch && textMatch;
+      });
 
       const logsEl = document.getElementById("logsList");
       if (!filtered.length) {
-        logsEl.textContent = "No study logs yet. Start the timer or log a session above!";
+        logsEl.textContent = "No matching study logs yet.";
       } else {
-        logsEl.innerHTML = filtered.slice(0, 35).map(l => `
+        logsEl.innerHTML = filtered.slice(0, 40).map(l => `
           <div class="item">
             <div>
-              <strong>${escapeHtml(l.student_name)}</strong> · ${escapeHtml(l.subject.toUpperCase())}<br/>
-              <span style="color:var(--muted); font-size:0.85rem;">${escapeHtml(l.topic)} (${l.minutes} mins)</span>
+              <strong>${escapeHtml(l.student_name)}</strong> · ${escapeHtml((l.subject || "").toUpperCase())}<br/>
+              <span style="color:var(--muted); font-size:0.84rem;">${escapeHtml(l.topic)} (${l.minutes} mins)</span>
             </div>
             <div class="item-actions">
-              <span class="badge ${l.status === 'Needs Revision' ? 'rev' : 'ok'}">${escapeHtml(l.status)}</span>
-              ${l.id ? `<button class="del-btn" title="Delete" onclick="deleteLog(${l.id})">🗑️</button>` : ""}
+              <button class="badge ${l.status === 'Needs Revision' ? 'rev' : 'ok'}"
+                title="Tap to flip status"
+                onclick="toggleLogStatus(${l.id}, '${escapeHtml(l.status)}')">
+                ${escapeHtml(l.status)}
+              </button>
+              ${l.id ? `<button class="icon-btn" title="Edit" onclick="openEditModal(${l.id})">✏️</button>` : ""}
+              ${l.id ? `<button class="icon-btn del" title="Delete" onclick="deleteLog(${l.id})">🗑️</button>` : ""}
             </div>
           </div>
         `).join("");
       }
 
-      // Leaderboard
       const boardEl = document.getElementById("boardList");
       if (!allLogs.length) {
         boardEl.textContent = "No data yet.";
@@ -477,11 +927,33 @@
           </div>
         `).join("");
       }
+
+      const subEl = document.getElementById("subjectBreakdown");
+      const subTotals = {};
+      MY_SUBJECTS.forEach(s => subTotals[s] = 0);
+      myLogs.forEach(l => {
+        const code = (l.subject || "").trim().toUpperCase();
+        if (code) subTotals[code] = (subTotals[code] || 0) + (l.minutes || 0);
+      });
+      subEl.innerHTML = Object.entries(subTotals)
+        .sort((a, b) => b[1] - a[1])
+        .map(([code, mins]) => `
+          <div class="stat-row">
+            <span><strong>${escapeHtml(code)}</strong> · ${subjectTrackers[code]?.topics_covered || 0} topics</span>
+            <span>${(mins / 60).toFixed(1)} hrs (${mins}m)</span>
+          </div>
+        `).join("");
     }
 
     function setSubjectFilter(sub) {
       selectedSubject = sub;
       renderStatsAndLogs();
+    }
+
+    function toggleHideOverdue() {
+      hideOverdue = !hideOverdue;
+      document.getElementById("toggleOverdueBtn").textContent = hideOverdue ? "Show All" : "Hide Overdue";
+      renderDeadlines();
     }
 
     function getDueBadge(dueStr) {
@@ -501,26 +973,30 @@
       const upcomingCount = allDeadlines.filter(d => new Date(d.due_date + "T00:00:00") >= today).length;
       document.getElementById("statDue").textContent = upcomingCount;
 
+      const list = hideOverdue
+        ? allDeadlines.filter(d => new Date(d.due_date + "T00:00:00") >= today)
+        : allDeadlines;
+
       const dlEl = document.getElementById("deadlinesList");
-      if (!allDeadlines.length) {
-        dlEl.textContent = "No deadlines added yet.";
+      if (!list.length) {
+        dlEl.textContent = "No deadlines to show.";
         return;
       }
-      dlEl.innerHTML = allDeadlines.map(d => `
+      dlEl.innerHTML = list.map(d => `
         <div class="item">
           <div>
-            <strong>${escapeHtml(d.subject.toUpperCase())}</strong>: ${escapeHtml(d.title)}<br/>
+            <strong>${escapeHtml((d.subject || "").toUpperCase())}</strong>: ${escapeHtml(d.title)}<br/>
             <span style="color:var(--muted); font-size:0.82rem;">Due: ${d.due_date}</span>
           </div>
           <div class="item-actions">
             ${getDueBadge(d.due_date)}
-            ${d.id ? `<button class="del-btn" title="Delete" onclick="deleteDeadline(${d.id})">🗑️</button>` : ""}
+            ${d.id ? `<button class="icon-btn del" title="Delete" onclick="deleteDeadline(${d.id})">🗑️</button>` : ""}
           </div>
         </div>
       `).join("");
     }
 
-    // 5. CRUD Operations
+    // 6. CRUD Operations
     async function addLog() {
       const student_name = document.getElementById("studentName").value.trim();
       const subject = document.getElementById("subject").value.trim().toUpperCase();
@@ -529,7 +1005,7 @@
       const status = document.getElementById("status").value;
 
       if (!student_name || !subject || !topic || !minutes) {
-        alert("Please fill in all fields.");
+        showToast("⚠️ Fill in name, subject, topic & minutes");
         return;
       }
 
@@ -543,10 +1019,67 @@
       btn.textContent = "+ Save Study Session";
 
       if (error) {
-        alert("Error saving: " + error.message);
+        showToast("Error: " + error.message);
       } else {
+        if (subjectTrackers[subject]) {
+          subjectTrackers[subject].topics_covered = (subjectTrackers[subject].topics_covered || 0) + 1;
+          await persistTracker(subject);
+        }
         document.getElementById("topic").value = "";
         document.getElementById("minutes").value = "";
+        showToast("✅ Saved & +1 topic on " + subject);
+        loadAll();
+      }
+    }
+
+    async function toggleLogStatus(id, currentStatus) {
+      if (!id) return;
+      const nextStatus = currentStatus === "Needs Revision" ? "Completed" : "Needs Revision";
+      const { error } = await db.from("study_logs").update({ status: nextStatus }).eq("id", id);
+      if (error) showToast("Error: " + error.message);
+      else {
+        showToast(`Marked as ${nextStatus}`);
+        loadAll();
+      }
+    }
+
+    function openEditModal(id) {
+      const log = allLogs.find(l => l.id === id);
+      if (!log) return;
+      document.getElementById("editLogId").value = log.id;
+      document.getElementById("editSubject").value = log.subject;
+      document.getElementById("editTopic").value = log.topic;
+      document.getElementById("editMinutes").value = log.minutes;
+      document.getElementById("editStatus").value = log.status;
+      document.getElementById("editModal").classList.remove("hidden");
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").classList.add("hidden");
+    }
+
+    async function saveEditLog() {
+      const id = parseInt(document.getElementById("editLogId").value, 10);
+      const subject = document.getElementById("editSubject").value.trim().toUpperCase();
+      const topic = document.getElementById("editTopic").value.trim();
+      const minutes = parseInt(document.getElementById("editMinutes").value, 10);
+      const status = document.getElementById("editStatus").value;
+
+      if (!subject || !topic || !minutes) {
+        showToast("⚠️ All fields are required");
+        return;
+      }
+
+      const { error } = await db
+        .from("study_logs")
+        .update({ subject, topic, minutes, status })
+        .eq("id", id);
+
+      if (error) {
+        showToast("Error: " + error.message);
+      } else {
+        closeEditModal();
+        showToast("✅ Study log updated");
         loadAll();
       }
     }
@@ -554,8 +1087,11 @@
     async function deleteLog(id) {
       if (!confirm("Delete this study log?")) return;
       const { error } = await db.from("study_logs").delete().eq("id", id);
-      if (error) alert("Error deleting: " + error.message);
-      else loadAll();
+      if (error) showToast("Error: " + error.message);
+      else {
+        showToast("🗑️ Log deleted");
+        loadAll();
+      }
     }
 
     async function addDeadline() {
@@ -564,17 +1100,17 @@
       const due_date = document.getElementById("dlDate").value;
 
       if (!subject || !title || !due_date) {
-        alert("Please fill in all deadline fields.");
+        showToast("⚠️ Fill in subject, title & due date");
         return;
       }
 
       const { error } = await db.from("deadlines").insert([{ subject, title, due_date }]);
       if (error) {
-        alert("Error saving deadline: " + error.message);
+        showToast("Error: " + error.message);
       } else {
-        document.getElementById("dlSubject").value = "";
         document.getElementById("dlTitle").value = "";
         document.getElementById("dlDate").value = "";
+        showToast("✅ Deadline added");
         loadAll();
       }
     }
@@ -582,15 +1118,18 @@
     async function deleteDeadline(id) {
       if (!confirm("Remove this deadline?")) return;
       const { error } = await db.from("deadlines").delete().eq("id", id);
-      if (error) alert("Error deleting: " + error.message);
-      else loadAll();
+      if (error) showToast("Error: " + error.message);
+      else {
+        showToast("🗑️ Deadline removed");
+        loadAll();
+      }
     }
 
-    // 6. Quick Paste-to-Import from VULMS
+    // 7. Quick Paste-to-Import from VULMS
     async function importFromLms() {
       const raw = document.getElementById("lmsPaste").value.trim();
       if (!raw) {
-        alert("Paste your VULMS assignment/quiz text first.");
+        showToast("⚠️ Paste VULMS text first");
         return;
       }
 
@@ -603,7 +1142,6 @@
         if (!codeMatch) return;
         const subject = codeMatch[1].toUpperCase();
 
-        // Match YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY, or "Nov 28, 2026"
         let due_date = null;
         const isoMatch = line.match(/\b(20\d{2})[-/](\d{1,2})[-/](\d{1,2})\b/);
         const dmyMatch = line.match(/\b(\d{1,2})[-/](\d{1,2})[-/](20\d{2})\b/);
@@ -633,7 +1171,7 @@
       });
 
       if (!parsed.length) {
-        alert("Could not find any course code (like CS201) + due date in that text. Check the format and try again.");
+        showToast("⚠️ No course code + date found");
         return;
       }
 
@@ -646,11 +1184,24 @@
       btn.textContent = "✨ Extract & Save Deadlines";
 
       if (error) {
-        alert("Error importing: " + error.message);
+        showToast("Error: " + error.message);
       } else {
         document.getElementById("lmsPaste").value = "";
-        alert(`Imported ${parsed.length} deadline(s)!`);
+        showToast(`✨ Imported ${parsed.length} deadline(s)!`);
         loadAll();
+      }
+    }
+
+    function shareSummary() {
+      const name = document.getElementById("studentName").value.trim() || "Hannan";
+      const hrs = document.getElementById("statHours").textContent;
+      const today = document.getElementById("statToday").textContent;
+      const streak = document.getElementById("statStreak").textContent;
+      const text = `📚 Safe Study Summary (${name})\n• Today: ${today}\n• Total: ${hrs}\n• Streak: ${streak}\n• Courses: CS201, CS302, STA301, PAK302, ENG201, ISL202`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => showToast("📋 Summary copied!"));
+      } else {
+        alert(text);
       }
     }
 
@@ -660,6 +1211,8 @@
       }[m]));
     }
 
+    initSubjectChips();
+    renderSubjectColumns();
     loadAll();
   </script>
 </body>

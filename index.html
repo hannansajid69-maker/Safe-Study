@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Class Study Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-dark: #0284c7;
+      --success: #22c55e;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      padding: 16px; max-width: 600px; margin-inline: auto;
+    }
+    h1 { font-size: 1.4rem; margin: 0 0 4px; }
+    p.sub { color: var(--muted); font-size: 0.9rem; margin: 0 0 16px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab {
+      flex: 1; padding: 10px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); border-radius: 10px;
+      font-weight: 600; cursor: pointer;
+    }
+    .tab.active { background: var(--accent-dark); border-color: var(--accent); }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; margin-bottom: 16px;
+    }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    input, select {
+      width: 100%; padding: 10px 12px; margin-bottom: 12px;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 1rem;
+    }
+    button.primary {
+      width: 100%; padding: 12px; border: none; border-radius: 10px;
+      background: var(--accent); color: #0f172a; font-weight: 700;
+      font-size: 1rem; cursor: pointer;
+    }
+    button.primary:disabled { opacity: 0.6; }
+    .item {
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .item:last-child { border-bottom: none; }
+    .badge {
+      font-size: 0.75rem; padding: 3px 8px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15); color: var(--accent); font-weight: 600;
+    }
+    .badge.rev { background: rgba(245, 158, 11, 0.15); color: var(--warn); }
+    .hidden { display: none; }
+    .stat-row { display: flex; justify-content: space-between; padding: 8px 0; }
+  </style>
+</head>
+<body>
+
+  <h1>📚 Class Study Tracker</h1>
+  <p class="sub">Log daily study sessions & track class deadlines</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('logs', this)">Study Logs</button>
+    <button class="tab" onclick="showTab('deadlines', this)">Deadlines</button>
+    <button class="tab" onclick="showTab('board', this)">Leaderboard</button>
+  </div>
+
+  <!-- TAB 1: STUDY LOGS -->
+  <div id="tab-logs">
+    <div class="card">
+      <label>Your Name</label>
+      <input id="studentName" placeholder="e.g., Hannan" />
+
+      <label>Subject / Course</label>
+      <input id="subject" placeholder="e.g., CS101 / Calculus" />
+
+      <label>Topic Covered</label>
+      <input id="topic" placeholder="e.g., Loops & Arrays" />
+
+      <label>Minutes Studied</label>
+      <input id="minutes" type="number" placeholder="45" />
+
+      <label>Status</label>
+      <select id="status">
+        <option value="Completed">Completed</option>
+        <option value="Needs Revision">Needs Revision</option>
+      </select>
+
+      <button class="primary" id="saveLogBtn" onclick="addLog()">+ Save Study Session</button>
+    </div>
+
+    <div class="card">
+      <strong>Recent Class Activity</strong>
+      <div id="logsList" style="margin-top: 8px; color: var(--muted);">Loading...</div>
+    </div>
+  </div>
+
+  <!-- TAB 2: DEADLINES -->
+  <div id="tab-deadlines" class="hidden">
+    <div class="card">
+      <label>Subject</label>
+      <input id="dlSubject" placeholder="e.g., MTH101" />
+
+      <label>Assignment / Quiz Title</label>
+      <input id="dlTitle" placeholder="e.g., Quiz 1" />
+
+      <label>Due Date</label>
+      <input id="dlDate" type="date" />
+
+      <button class="primary" onclick="addDeadline()">+ Add Class Deadline</button>
+    </div>
+
+    <div class="card">
+      <strong>Upcoming Deadlines</strong>
+      <div id="deadlinesList" style="margin-top: 8px; color: var(--muted);">Loading...</div>
+    </div>
+  </div>
+
+  <!-- TAB 3: LEADERBOARD -->
+  <div id="tab-board" class="hidden">
+    <div class="card">
+      <strong>🏆 Total Study Time by Student</strong>
+      <div id="boardList" style="margin-top: 10px; color: var(--muted);">Loading...</div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://difzwjrijpwxujevfxvv.supabase.co";
+    const SUPABASE_KEY = "Sb_publishable_wNeXtuZT66eNdobvyRjTOw_W5oznjv3";
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const savedName = localStorage.getItem("studentName");
+    if (savedName) document.getElementById("studentName").value = savedName;
+
+    function showTab(name, btn) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      ["logs", "deadlines", "board"].forEach(id => {
+        document.getElementById("tab-" + id).classList.toggle("hidden", id !== name);
+      });
+    }
+
+    async function loadAll() {
+      const { data: logs, error: logErr } = await db
+        .from("study_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(30);
+
+      const logsEl = document.getElementById("logsList");
+      const boardEl = document.getElementById("boardList");
+
+      if (logErr) {
+        logsEl.innerHTML = `<span style="color:#f87171;">Error: ${logErr.message}</span>`;
+      } else if (!logs.length) {
+        logsEl.textContent = "No study logs yet. Be the first to log a session!";
+        boardEl.textContent = "No data yet.";
+      } else {
+        logsEl.innerHTML = logs.map(l => `
+          <div class="item">
+            <div>
+              <strong>${escapeHtml(l.student_name)}</strong> · ${escapeHtml(l.subject)}<br/>
+              <span style="color:var(--muted); font-size:0.88rem;">${escapeHtml(l.topic)} (${l.minutes} mins)</span>
+            </div>
+            <span class="badge ${l.status === 'Needs Revision' ? 'rev' : ''}">${escapeHtml(l.status)}</span>
+          </div>
+        `).join("");
+
+        const totals = {};
+        logs.forEach(l => {
+          const key = l.student_name.trim();
+          totals[key] = (totals[key] || 0) + (l.minutes || 0);
+        });
+        const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+        boardEl.innerHTML = sorted.map(([name, mins], i) => `
+          <div class="stat-row">
+            <span>#${i + 1} <strong>${escapeHtml(name)}</strong></span>
+            <span>${(mins / 60).toFixed(1)} hrs (${mins}m)</span>
+          </div>
+        `).join("");
+      }
+
+      const { data: dls, error: dlErr } = await db
+        .from("deadlines")
+        .select("*")
+        .order("due_date", { ascending: true });
+
+      const dlEl = document.getElementById("deadlinesList");
+      if (dlErr) {
+        dlEl.innerHTML = `<span style="color:#f87171;">Error: ${dlErr.message}</span>`;
+      } else if (!dls.length) {
+        dlEl.textContent = "No deadlines added yet.";
+      } else {
+        dlEl.innerHTML = dls.map(d => `
+          <div class="item">
+            <div>
+              <strong>${escapeHtml(d.subject)}</strong>: ${escapeHtml(d.title)}<br/>
+              <span style="color:var(--muted); font-size:0.85rem;">Due: ${d.due_date}</span>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    async function addLog() {
+      const student_name = document.getElementById("studentName").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const topic = document.getElementById("topic").value.trim();
+      const minutes = parseInt(document.getElementById("minutes").value, 10);
+      const status = document.getElementById("status").value;
+
+      if (!student_name || !subject || !topic || !minutes) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      localStorage.setItem("studentName", student_name);
+      const btn = document.getElementById("saveLogBtn");
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      const { error } = await db.from("study_logs").insert([{ student_name, subject, topic, minutes, status }]);
+      btn.disabled = false;
+      btn.textContent = "+ Save Study Session";
+
+      if (error) {
+        alert("Error saving: " + error.message);
+      } else {
+        document.getElementById("topic").value = "";
+        document.getElementById("minutes").value = "";
+        loadAll();
+      }
+    }
+
+    async function addDeadline() {
+      const subject = document.getElementById("dlSubject").value.trim();
+      const title = document.getElementById("dlTitle").value.trim();
+      const due_date = document.getElementById("dlDate").value;
+
+      if (!subject || !title || !due_date) {
+        alert("Please fill in all deadline fields.");
+        return;
+      }
+
+      const { error } = await db.from("deadlines").insert([{ subject, title, due_date }]);
+      if (error) {
+        alert("Error saving deadline: " + error.message);
+      } else {
+        document.getElementById("dlSubject").value = "";
+        document.getElementById("dlTitle").value = "";
+        document.getElementById("dlDate").value = "";
+        loadAll();
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[m]));
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
